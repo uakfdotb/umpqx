@@ -1,0 +1,96 @@
+============================
+umpqx MPQ extraction utility
+============================
+
+umpqx is a simple command-line MPQ extraction utility.
+It also features the ability to reconstruct MPQ's.
+As far as I know, umpqx is the only free MPQ extractor that can rebuild the listfile.
+See MPQ Recover and RMPQEx for similar non-free tools.
+
+The official umpqx webpage is at:
+	https://code.google.com/p/umpqx/
+For support, please reply to this topic at codelain.com:
+	http://www.codelain.com/forum/index.php?topic=21713.0
+Alternatively, use the Issues tracker on the Google Project Hosting page.
+
+umpqx is developed by uakf.b and released under the GNU General Public License v3.0.
+See LICENSE or http://www.gnu.org/licenses/quick-guide-gplv3.html for details.
+
+Installation
+------------
+You will need the StormLib MPQ library to use umpqx.
+If you don't have this already, you can compile on Linux with
+	cd umpqx_path/StormLib
+	mv Makefile.linux Makefile
+	make && make install
+
+On Windows, download Visual C++ 2008, open the umpqx_path/StormLib/StormLib.sln file.
+Then, compile the solution.
+Once that is done, move the created StormLib.dll and StormLib.lib to umpqx_path/
+	(the .dll and .lib should be located in umpqx_path/StormLib/bin/StormLib_dll/.../)
+Now, open umpqx.sln, and compile.
+
+Compile umpqx with the included script on Linux platforms:
+	./compile.sh
+
+On Windows, open umpqx.sln in Visual C++, and compile.
+
+Special Windows instructions
+----------------------------
+
+In the rest of this README, "./umpqx" should be replaced with "umpqx.exe" if using Windows.
+
+Also, to run umpqx, open Command Prompt (Start -> type cmd -> select Command Prompt).
+Then use cd to change directory to wherever umpqx is located.
+And then copy the options below, replacing like stated above.
+
+Command-line arguments
+----------------------
+
+umpqx should be run like:
+	./umpqx [options] [listfile1 listfile2 ...] MPQ file
+
+Options (options are space-separated, cannot be combined with one dash):
+	-w working_directory: use working_directory as the working directory (default is "working")
+	-d: enable debug mode
+	-c: create a new MPQ file from the files in working directory (instead of extracting)
+	
+	-search: if extracting, search for extra files that are not in listfile
+	-now: if extracting, disable actually writing to files (this can be useful if using -av)
+	-av: if extracting, enables antivirus to search for exploits in map
+	-w3mmd: if extracting, add W3MMD code to the war3map.j JASS script
+	
+	-compact: if creating, compacts MPQ after adding files is completed
+	-compress: if creating, compresses files as they are added using StormLib's MPQ_COMPRESSION_ZLIB option
+	-header mpq_source: if creating, prepends header from an external MPQ to the generated one
+
+Note: if no listfiles are specified, the default "listfile.txt" is used.
+
+Usage
+-----
+
+First, you probably would want to extract files from a map:
+	./umpqx -w map_files/ map.w3x
+
+Use the search option if the list file is incomplete (for protected maps):
+	./umpqx -w map_files/ -search map.w3x
+
+You may also want to detect exploits in the map as you extract:
+	./umpqx -w map_files/ -search -av map.w3x
+
+If you just want the exploit detection, better to speed it up with a shorter listfile and no file search:
+	./umpqx -w map_files/ -now -av listfile_fast.txt map.w3x
+
+Once you're done editing whatever files you want to, you create an MPQ with:
+	./umpqx -w map_files/ -c reconstructed.mpq
+
+Unfortunately, this MPQ file is not loadable by Warcraft III.
+To make it playable, you need to copy the 512-byte header from the original map:
+	./umpqx -w map_files/ -header map.w3x -c map_new.w3x
+
+Now, map_new.w3x can be copied to your Maps folder and can be played.
+But, it'll probably be much larger than the original map because compression is disabled by default.
+To solve this:
+	./umpqx -w map_files/ -header map.w3x -compress -compact -c map_new.w3x
+
+This will enable both compression and compacting.
