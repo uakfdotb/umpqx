@@ -1,1 +1,1 @@
-g++ -IStormLib/src umpqx.cpp -o umpqx -lStorm -g
+g++ umpqx.cpp -o umpqx -lstorm -lz -lbz2 -g
